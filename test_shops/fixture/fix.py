@@ -1,52 +1,26 @@
 import pytest
-"""
-Фикстура - это объект, который можно рассматривать, как набор условий 
-необходимых тесту для выполнения, например, зачастую фикстуры создаются, чтобы генерировать
-какие-то данные еще до теста и возвращать их для использования в тесте или перед тестом,
-"""
-
-@pytest.fixture()
-def sample_list():
-    print('\n Фикстура sample_list: создаю список')
-    return [1, 2, 3, 4, 5]
+import os
 
 
 @pytest.fixture()
-def sample_dict():
-    print('\n Фикстура sample_dict: создаю словарь')
-    return {'name':'Alice','age':30}
+def temp_file_fixture():
+    file_path = 'temp_test_file.txt'
+    print(f'Фикстура: создаю файл {file_path}')
+    with open(file_path,'w') as f:
+        f.write('Hello, pytest!')
+
+    yield file_path # тест получает это значение
+
+    print(f'Фикстура удаляет файл {file_path}')
+    os.remove(file_path)
 
 
-def test_len_list(sample_list): # имя фикстуры передается как аргумент
-    assert len(sample_list) == 5
-
-def test_dict_name(sample_dict):
-    assert sample_dict['name'] =='Alice'
-
-
-def test_list_and_dict(sample_dict,sample_list):
-    assert len(sample_list) >0
-    assert 'age' in sample_dict
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+def test_read_temp_file(temp_file_fixture):
+    file_path = temp_file_fixture # получаем путь к файлу от фикстуры
+    print(f'Тест чистаю файл {file_path}')
+    with open(file_path, 'r') as f:
+        content = f.read()
+    assert content == 'Hello, pytest!'
 
 
 
